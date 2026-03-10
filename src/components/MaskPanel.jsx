@@ -28,7 +28,7 @@ export default function MaskPanel({ onMapChange }) {
   const [input, setInput] = useState(SAMPLE);
   const [output, setOutput] = useState("");
   const [mapping, setMapping] = useState([]);
-  const [options, setOptions] = useState({ maskMethods: true, maskVariables: true, maskClasses: true, prefix: "" });
+  const [options, setOptions] = useState({ maskMethods: true, maskVariables: true, maskClasses: true, maskAnnotations: true, maskImports: true, prefix: "" });
   const [copied, setCopied] = useState(false);
   const [tab, setTab] = useState("split");
   const [mapErrors, setMapErrors] = useState({});
@@ -81,7 +81,7 @@ export default function MaskPanel({ onMapChange }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
       <div style={{ padding: "12px 24px", borderBottom: "1px solid #1e2030", display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", background: "#0c0c15" }}>
-        {[{ key: "maskMethods", label: "Methods", color: "#7dd3fc" }, { key: "maskVariables", label: "Variables", color: "#86efac" }, { key: "maskClasses", label: "Classes / DTOs", color: "#f9a8d4" }].map(({ key, label, color }) => (
+        {[{ key: "maskMethods", label: "Methods", color: "#7dd3fc" }, { key: "maskVariables", label: "Variables", color: "#86efac" }, { key: "maskClasses", label: "Classes / DTOs", color: "#f9a8d4" }, { key: "maskAnnotations", label: "Annotations", color: "#fbbf24" }, { key: "maskImports", label: "Remove Imports", color: "#f87171" }].map(({ key, label, color }) => (
           <button key={key} onClick={() => toggle(key)} style={{ padding: "5px 14px", borderRadius: 20, border: `1px solid ${options[key] ? color : "#2a2a3a"}`, background: options[key] ? `${color}18` : "transparent", color: options[key] ? color : "#4a5568", fontSize: 11, fontFamily: MONO, cursor: "pointer", letterSpacing: "0.06em" }}>
             {options[key] ? "✓ " : ""}{label}
           </button>
