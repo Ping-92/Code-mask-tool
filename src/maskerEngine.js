@@ -110,16 +110,26 @@ export function maskCode(code, options) {
       if (!inSkip(m.index) && !RESERVED.has(m[1])) { classNames.add(m[1]); assign(m[1], "class"); }
   }
 
-  // ── Step 3: Methods ──
+// ── Step 3: Methods ──
   const methodNames = new Set();
   if (maskMethods) {
     for (const m of result.matchAll(/\b([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/g)) {
       const name = m[1];
       if (inSkip(m.index) || RESERVED.has(name) || classNames.has(name)) continue;
       const before = result.slice(Math.max(0, m.index - 80), m.index);
-      const isDef = /(?:public|private|protected|static|async|override|virtual|abstract|def\s)\s*(?:[\w<>\[\]?,\s]+\s+)?$/.test(before)
-        || /\bfunction\s+$/.test(before) || /\bdef\s+$/.test(before);
+      const isDef =
+        /(?:public|private|protected|static|async|override|virtual|abstract|def\s)\s*(?:[\w<>\[\]?,\s]+\s+)?$/.test(before)
+        || /\bfunction\s+$/.test(before)
+        || /\bdef\s+$/.test(before);
       if (isDef) { methodNames.add(name); assign(name, "method"); }
+    }
+
+// Getter / setter definitions and calls: getXxx setXxx isXxx
+    for (const m of result.matchAll(/\b((?:get|set|is)[A-Z][A-Za-z0-9_]*)\s*\(/g)) {
+      const name = m[1];
+      if (inSkip(m.index) || RESERVED.has(name)) continue;
+      methodNames.add(name);
+      assign(name, "method");
     }
   }
 
@@ -132,6 +142,12 @@ export function maskCode(code, options) {
     for (const m of result.matchAll(/\b[A-Z][A-Za-z0-9_$]*(?:<[^>]+>)?\s+([a-z][A-Za-z0-9_$]*)\s*[=;,)]/g)) {
       const name = m[1];
       if (!inSkip(m.index) && !RESERVED.has(name) && !classNames.has(name) && !methodNames.has(name)) assign(name, "var");
+    }
+    // Names ending in Service, Config, Client — fields, params, local vars
+    for (const m of result.matchAll(/\b([a-z][A-Za-z0-9_]*(?:Service|Config|Client))\b/g)) {
+      const name = m[1];
+      if (inSkip(m.index) || RESERVED.has(name) || classNames.has(name) || methodNames.has(name)) continue;
+      assign(name, "var");
     }
   }
 
